@@ -4,12 +4,14 @@
 #define ledVerde 23
 //mensagem enviada pelo client (aplicativo)
 String ClientRequest;
+//Estas lineas se comentan para dejar la configuracion de IP dinamica //////////////
 //ip estático, o mesmo deve ser usado no app do smartphone
 IPAddress staticIP(192,168,0,25);
 //gateway, deixe aqui o gateway da rede em que está conectado
 IPAddress gateway(192,168,3,255);
 //máscara, deixe aqui a máscara da rede em que está conectado
 IPAddress subnet(255,255,255,0);
+//////////////////////////////////////////////////////////////////////////
 //objeto do servidor
 WiFiServer server(80);
 //objeto do cliente
@@ -62,7 +64,10 @@ Serial.print(".");
 //exibe "conectado"
 Serial.println("Connected");
 //configura ip estático, gateway e máscara (definidos globais no início do código)
+    
+//esta linea se comenta para configurar la IP dinamica 
 WiFi.config(staticIP, gateway, subnet);
+///////////////////////////////////////////////////////////
 //exibe ip utilizado pelo ESP
 Serial.println("Your IP is");
 Serial.println((WiFi.localIP()));
