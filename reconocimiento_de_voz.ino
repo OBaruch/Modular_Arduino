@@ -6,7 +6,7 @@
 String ClientRequest;
 //Estas lineas se comentan para dejar la configuracion de IP dinamica //////////////
 //ip estático, o mesmo deve ser usado no app do smartphone
-IPAddress staticIP(192,168,0,25);
+IPAddress staticIP(192,168,43,211); //http://192.168.43.211
 //gateway, deixe aqui o gateway da rede em que está conectado
 IPAddress gateway(192,168,3,255);
 //máscara, deixe aqui a máscara da rede em que está conectado
@@ -52,9 +52,9 @@ delay(10);
 Serial.println("START");
     Serial.println();
     Serial.print("Connecting to ");
-    Serial.println("JyL_Mazamitla (Planta Alta)");
+    Serial.println("virus");
 //configura ssid e senha da rede
-WiFi.begin("JyL_Mazamitla (Planta Alta)", "L21503733711108");
+WiFi.begin("virus", "123123123");
 //enquanto não conectar exibe "."
 while (WiFi.status() != WL_CONNECTED)
 {
@@ -93,20 +93,36 @@ Serial.println("respuesta");
 ClientRequest.remove(0, 5);
 ClientRequest.remove(ClientRequest.length()-9,9);
 //controla led conforme o comando recebido
-if (ClientRequest == "prender")
-digitalWrite(ledVerde,HIGH);
-if (ClientRequest == "apagar")
-digitalWrite(ledVerde,LOW);
-if (ClientRequest == "parpadear")
+if (ClientRequest == "navidad")
 {
-digitalWrite(ledVerde,HIGH);
-delay(500);
-digitalWrite(ledVerde,LOW);
-delay(500);
-digitalWrite(ledVerde,HIGH);
-delay(500);
-digitalWrite(ledVerde,LOW);
-delay(500);
+    digitalWrite(ledVerde,HIGH);
+}
+
+if (ClientRequest == "hora")
+{
+    digitalWrite(ledVerde,LOW);
+}
+if (ClientRequest == "luces")
+{
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+}
+    if (ClientRequest == "baila")
+{
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
 }
 //exibe na página a palavra "OK", caso acessado por um navegador
 //se estiver no aplicativo esta exibição não será feita
