@@ -1,139 +1,156 @@
-//lib necessária para conectar o wifi
+#include <Servo.h>
 #include <WiFi.h>
-//led conectado no pino 23
 #define ledVerde 23
-//mensagem enviada pelo client (aplicativo)
 String ClientRequest;
-//Estas lineas se comentan para dejar la configuracion de IP dinamica //////////////
-//ip estático, o mesmo deve ser usado no app do smartphone
-IPAddress staticIP(192,168,43,211); //http://192.168.43.211
-//gateway, deixe aqui o gateway da rede em que está conectado
-IPAddress gateway(192,168,3,255);
-//máscara, deixe aqui a máscara da rede em que está conectado
-IPAddress subnet(255,255,255,0);
-//////////////////////////////////////////////////////////////////////////
-//objeto do servidor
+///////////////////////////////////////////////////////////////////////////////////////////////////////ESTABLECER IP
+IPAddress staticIP(192, 168, 43, 211); //http://192.168.43.211
+IPAddress gateway(192, 168, 3, 255);
+IPAddress subnet(255, 255, 255, 0);
 WiFiServer server(80);
-//objeto do cliente
 WiFiClient client;
-//variável usada para obter o request do client
 String myresultat;
+///////////////////////////////////////////////////////////////////////////////////////////////////////VARIABLES DE SERVOS
+static const int servosPins[3] = {18, 19, 21}; 
+Servo servos[3];
+///////////////////////////////////////////////////////////////////////////////////////////////////////FUNCIONES
 
-//função usada para a leitura do request sem caracteres de quebra de linha como "\n" ou "\r"
+void setServos(int degrees,int s) {
+  servos[s].write((degrees + (35 * s)) % 180);  
+}
+
+
 String ReadIncomingRequest()
 {
-//enquanto houver bytes enviados pelo client
-while(client.available())
-{
-//atribui para a variável String o comando enviado pelo cliente sem "\r"
-ClientRequest = (client.readStringUntil('\r'));
-//se existir "HTTP/1.1" na String então recebe comando, senão o comando não é aceito
-//isso verifica que a solicitação seja HTTP/1.1
-if ((ClientRequest.indexOf("HTTP/1.1")>0))
-myresultat = ClientRequest;
+  while (client.available())
+  {
+    ClientRequest = (client.readStringUntil('\r'));
+    if ((ClientRequest.indexOf("HTTP/1.1") > 0))
+      myresultat = ClientRequest;
+  }
+  return myresultat;
 }
-//retorna variável
-return myresultat;
-}
+
+
+
+
+
+
+
+
+
+
 
 
 
 void setup()
 {
-//inicializa varíavel como vazia
-ClientRequest = "";
-//define pino do led como saída
-pinMode(ledVerde,OUTPUT);
-//inicializa serial com 115200 bits por segundo
-Serial.begin(115200);
-//aguarda 10ms
-delay(10);
-//A partir daqui conecta wifi
-Serial.println("START");
-    Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println("virus");
-//configura ssid e senha da rede
-WiFi.begin("virus", "123123123");
-//enquanto não conectar exibe "."
-while (WiFi.status() != WL_CONNECTED)
-{
-delay(500);
-Serial.print(".");
+  Serial.begin(115200);
+  ClientRequest = "";
+  pinMode(ledVerde, OUTPUT);
+  Serial.begin(115200);
+  delay(10);
+///////////////////////////////////////////////////////////////////////////////////////////////////////CONECTAR A WIFI
+  Serial.println("START");
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println("virus");
+  WiFi.begin("virus", "123123123");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Connected");
+  WiFi.config(staticIP, gateway, subnet);  
+  Serial.println("Your IP is");
+  Serial.println((WiFi.localIP()));
+///////////////////////////////////////////////////////////////////////////////////////////////////////INICIALIZAR SERVIDOR
+  server.begin();
+///////////////////////////////////////////////////////////////////////////////////////////////////////CONEXION DE SERVOS
+      for(int i = 0; i < 3; ++i) {
+        if(!servos[i].attach(servosPins[i])) {
+            Serial.print("Servo ");
+            Serial.print(i); 
+            Serial.println("attach error");
+        }
+    }
 }
-//exibe "conectado"
-Serial.println("Connected");
-//configura ip estático, gateway e máscara (definidos globais no início do código)
-    
-//esta linea se comenta para configurar la IP dinamica 
-WiFi.config(staticIP, gateway, subnet);
-///////////////////////////////////////////////////////////
-//exibe ip utilizado pelo ESP
-Serial.println("Your IP is");
-Serial.println((WiFi.localIP()));
-//inicializa servidor
-server.begin();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void loop()
 {
-//obtém cliente
-client = server.available();
-//se ele for nulo, retorna até que ele realmente exista
-if (!client)
-return;
-//enquanto não existir request aguarda
-while(!client.available())
-delay(1);
-//obtém request utilizando a função local ReadIncomingRequest
-ClientRequest = (ReadIncomingRequest());
-Serial.println("respuesta");
-//retira dados da página e obtém apenas o comando enviado
-ClientRequest.remove(0, 5);
-ClientRequest.remove(ClientRequest.length()-9,9);
-//controla led conforme o comando recebido
-if (ClientRequest == "navidad")
-{
-    digitalWrite(ledVerde,HIGH);
-}
 
-if (ClientRequest == "hora")
-{
-    digitalWrite(ledVerde,LOW);
-}
-if (ClientRequest == "luces")
-{
-    digitalWrite(ledVerde,HIGH);
-    delay(500);
-    digitalWrite(ledVerde,LOW);
-    delay(500);
-    digitalWrite(ledVerde,HIGH);
-    delay(500);
-    digitalWrite(ledVerde,LOW);
-    delay(500);
-}
-    if (ClientRequest == "baila")
-{
-    digitalWrite(ledVerde,HIGH);
-    delay(500);
-    digitalWrite(ledVerde,LOW);
-    delay(500);
-    digitalWrite(ledVerde,HIGH);
-    delay(500);
-    digitalWrite(ledVerde,LOW);
-    delay(500);
-}
-//exibe na página a palavra "OK", caso acessado por um navegador
-//se estiver no aplicativo esta exibição não será feita
-client.println("HTTP/1.1 200 OK");
-client.println("Content-Type: text/html");
-client.println("");
-client.println("");
-client.println("");
-client.println("OK");
-client.println("");
-client.flush();
-client.stop();
-delay(1);
+///////////////////////////////////////////////////////////////////////////////////////////////////////BUSCAR CLIENTE EN EL SERVIDOR
+  //obtém cliente
+  client = server.available();
+  if (!client)
+    return;
+  while (!client.available())
+    delay(1);
+///////////////////////////////////////////////////////////////////////////////////////////////////////LEER URL
+  ClientRequest = (ReadIncomingRequest());
+  ClientRequest.remove(0, 5);
+  ClientRequest.remove(ClientRequest.length() - 9, 9);
+  Serial.println(ClientRequest);
+///////////////////////////////////////////////////////////////////////////////////////////////////////COMANDOS
+  if (ClientRequest == "navidad")
+  {
+  }
+
+  if (ClientRequest == "hora")
+  {
+  }
+  if (ClientRequest == "luces")
+  {
+  }
+  if (ClientRequest == "baila")
+  {
+
+  }
+  if (ClientRequest == "no")
+  {
+    int pos =0;
+    while (pos <= 179) {
+    setServos(pos,2);
+    delay(20);
+    Serial.println(pos);
+    pos=pos+20;  
+    }    
+    int posD = 179;
+    while (posD >= 0) {
+    setServos(posD,2);
+    Serial.println(posD);
+    delay(20);
+    posD=posD-20;
+    }
+      
+  }
+  if (ClientRequest == "si")
+  {
+
+  }
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println("");
+  client.println("");
+  client.println("");
+  client.println("OK");
+  client.println("");
+  client.flush();
+  client.stop();
+  delay(1);
 }
