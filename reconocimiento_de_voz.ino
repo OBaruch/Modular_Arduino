@@ -124,6 +124,28 @@ if (ClientRequest == "luces")
     digitalWrite(ledVerde,LOW);
     delay(500);
 }
+        if (ClientRequest == "no")
+{
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+}
+            if (ClientRequest == "si")
+{
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+    digitalWrite(ledVerde,HIGH);
+    delay(500);
+    digitalWrite(ledVerde,LOW);
+    delay(500);
+}
 //exibe na página a palavra "OK", caso acessado por um navegador
 //se estiver no aplicativo esta exibição não será feita
 client.println("HTTP/1.1 200 OK");
